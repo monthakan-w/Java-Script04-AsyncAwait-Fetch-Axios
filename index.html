@@ -78,53 +78,70 @@
         }
 
         function updateChart(users) {
-            const nationalities = _.countBy(users, 'nat');
-            const labels = Object.keys(nationalities);
-            const data = Object.values(nationalities);
-            const colors = labels.map((_, i) => `hsl(${i * 40}, 70%, 60%)`);
+    const nationalities = _.countBy(users, 'nat');
+    const labels = Object.keys(nationalities);
+    const data = Object.values(nationalities);
 
-            if (nationalityChart) {
-                nationalityChart.destroy();
-            }
+    // สีพาสเทลสุภาพ
+    const pastelColors = [
+        '#A5D8FF', '#B5EAD7', '#FFDAC1', '#E2F0CB', '#FFB3C1',
+        '#FFD6A5', '#C3FBD8', '#D0E6A5', '#D3C0F9', '#B5B9FF'
+    ];
 
-            nationalityChart = new Chart(document.getElementById('nationalityChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Number of Users by Nationality',
-                        data: data,
-                        backgroundColor: colors.map(color => color + '99'),
-                        borderColor: colors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Users',
-                                font: { size: 14 }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Nationality',
-                                font: { size: 14 }
-                            }
-                        }
+    const backgroundColors = labels.map((_, i) => pastelColors[i % pastelColors.length]);
+
+    if (nationalityChart) {
+        nationalityChart.destroy();
+    }
+
+    nationalityChart = new Chart(document.getElementById('nationalityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Nationality',
+                data: data,
+                backgroundColor: backgroundColors,
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Main title',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
                     },
-                    plugins: {
-                        legend: {
-                            position: 'top',
+                    padding: {
+                        bottom: 4
+                    }
+                },
+                subtitle: {
+                    display: true,
+                    text: 'Secondary title',
+                    font: {
+                        size: 14
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#4B5563',
+                        font: {
+                            size: 12
                         }
                     }
                 }
-            });
+            }
         }
+    });
+}
+
 
         fetchButton.addEventListener('click', fetchUsers);
         fetchUsers(); // Initial fetch
