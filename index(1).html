@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Random Users Dashboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Day.js -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs/dayjs.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Header -->
+  <header class="bg-sky-600 text-white py-6 shadow">
+    <h1 class="text-center text-3xl font-semibold">Random User API Dashboard</h1>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6">
+    <!-- Button -->
+    <div class="text-center mb-6">
+      <button onclick="loadUsers()" class="bg-sky-600 text-white px-6 py-2 rounded hover:bg-sky-800 transition">
+        ดึงข้อมูลผู้ใช้
+      </button>
+    </div>
+
+    <!-- Users -->
+    <div id="userContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+    <!-- Chart -->
+    <div class="mt-10">
+      <canvas id="genderChart" class="bg-white rounded shadow p-4"></canvas>
+    </div>
+  </main>
+
+  <script>
+    async function loadUsers() {
+      const container = document.getElementById('userContainer');
+      container.innerHTML = `<div class="col-span-full text-center text-lg text-gray-500">กำลังโหลดข้อมูล...</div>`;
+
+      try {
+        const response = await axios.get('https://randomuser.me/api/?results=10');
+        const users = response.data.results;
+
+        container.innerHTML = ''; // clear content
+
+        let maleCount = 0;
+        let femaleCount = 0;
+
+        users.forEach(user => {
+          if (user.gender === 'male') maleCount++;
+          if (user.gender === 'female') femaleCount++;
+
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-lg shadow p-4 flex flex-col items-center text-center';
+
+          card.innerHTML = `
+            <img src="${user.picture.medium}" alt="${user.name.first}" class="rounded-full mb-4 shadow w-24 h-24 object-cover" />
+            <h3 class="font-semibold text-lg">${user.name.title} ${user.name.first} ${user.name.last}</h3>
+            <p class="text-sm text-gray-600 mb-1">Gender: ${user.gender}</p>
+            <p class="text-sm text-gray-600 mb-1">Email: ${user.email}</p>
+            <p class="text-sm text-gray-600">Registered: ${dayjs(user.registered.date).format('YYYY-MM-DD')}</p>
+          `;
+
+          container.appendChild(card);
+        });
+
+        renderGenderChart(maleCount, femaleCount);
+      } catch (error) {
+        console.error('เกิดข้อผิดพลาดในการโหลดข้อมูล:', error.message);
+        container.innerHTML = `<div class="col-span-full text-center text-red-600 font-medium">ไม่สามารถโหลดข้อมูลได้</div>`;
+      }
+    }
+
+    function renderGenderChart(male, female) {
+      const ctx = document.getElementById('genderChart').getContext('2d');
+
+      if (window.genderChartInstance) {
+        window.genderChartInstance.destroy();
+      }
+
+      window.genderChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Male', 'Female'],
+          datasets: [{
+            label: 'จำนวนผู้ใช้ตามเพศ',
+            data: [male, female],
+            backgroundColor: ['#3b82f6', '#ec4899']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
