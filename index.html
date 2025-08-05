@@ -21,7 +21,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">User Data</h2>
-                <div class="overflow-x-auto">
+                <!-- <div class="overflow-x-auto">
                     <table id="userTable" class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-blue-100 text-gray-700">
@@ -34,7 +34,8 @@
                         </thead>
                         <tbody id="userTableBody"></tbody>
                     </table>
-                </div>
+                </div> -->
+                <div id="userTableBody" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
             </div>
             <div class="bg-white p-6 rounded-xl shadow-lg">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">Nationality Distribution</h2>
@@ -59,23 +60,44 @@
             }
         }
 
+        // function displayUsers(users) {
+        //     userTableBody.innerHTML = '';
+        //     users.forEach(user => {
+        //         const row = document.createElement('tr');
+        //         row.className = 'hover:bg-gray-50 transition duration-200';
+        //         row.innerHTML = `
+        //             <td class="p-3 border-b">
+        //                 <img src="${user.picture.thumbnail}" alt="User" class="w-12 h-12 rounded-full object-cover">
+        //             </td>
+        //             <td class="p-3 border-b">${user.name.first} ${user.name.last}</td>
+        //             <td class="p-3 border-b">${user.email}</td>
+        //            ទ <td class="p-3 border-b">${user.nat}</td>
+        //             <td class="p-3 border-b">${user.dob.age}</td>
+        //         `;
+        //         userTableBody.appendChild(row);
+        //     });
+        // }
+
         function displayUsers(users) {
-            userTableBody.innerHTML = '';
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50 transition duration-200';
-                row.innerHTML = `
-                    <td class="p-3 border-b">
-                        <img src="${user.picture.thumbnail}" alt="User" class="w-12 h-12 rounded-full object-cover">
-                    </td>
-                    <td class="p-3 border-b">${user.name.first} ${user.name.last}</td>
-                    <td class="p-3 border-b">${user.email}</td>
-                   ទ <td class="p-3 border-b">${user.nat}</td>
-                    <td class="p-3 border-b">${user.dob.age}</td>
-                `;
-                userTableBody.appendChild(row);
-            });
-        }
+    const container = document.getElementById('userTableBody');
+    container.innerHTML = ''; // ล้างข้อมูลเก่า
+
+    users.forEach(user => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl shadow p-4 flex flex-col items-center text-center transition hover:shadow-xl';
+
+        card.innerHTML = `
+            <img src="${user.picture.medium}" alt="User Picture" class="w-24 h-24 rounded-full object-cover mb-4 shadow-md" />
+            <h3 class="text-lg font-semibold text-gray-800 mb-1">${user.name.first} ${user.name.last}</h3>
+            <p class="text-sm text-gray-600 mb-1">${user.email}</p>
+            <p class="text-sm text-gray-600 mb-1">Nationality: ${user.nat}</p>
+            <p class="text-sm text-gray-600">Age: ${user.dob.age}</p>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
 
         function updateChart(users) {
     const nationalities = _.countBy(users, 'nat');
